@@ -27,7 +27,7 @@ public class GenderService implements DAO<Gender, Integer> {
     @Override
     public List<Gender> readAll() {
         try (Session session = factory.openSession()){
-            String hql = "FROM Clients ";
+            String hql = "FROM Gender ";
             Query query = session.createQuery(hql);
             return query.getResultList();
         }

@@ -29,6 +29,7 @@ import java.util.List;
 public class ClientsTableController {
     private final SessionFactory factory = new Configuration().configure().buildSessionFactory();
     public ObservableList<Clients> clientsObservableList = FXCollections.observableArrayList();
+
     @FXML
     public TableView<Clients> clientsTableView;@FXML
     public TableColumn<Clients,Integer> idColumn;@FXML
@@ -59,10 +60,27 @@ public class ClientsTableController {
     private String photoPathData = "";
     @FXML
     public void initialize() {
-        createButton.setOnAction(ActionEvent ->{
-            Stage stage = new Stage();
+        updateButton.setOnAction(ActionEvent ->{
+            Stage primaryStage = new Stage();
             try {
-                Parent parent = FXMLLoader.load(new File("C:\\JavaProjects\\demoProject1group\\src\\main\\java\\view\\CreateWindow.fxml").toURI().toURL());
+                URL url = new File("C:\\JavaProjects\\demoProject1group\\src\\main\\java\\view\\UpdateClientWindow.fxml").toURI().toURL();
+                Parent root = FXMLLoader.load(url);
+                primaryStage.setTitle("Update Client");
+                primaryStage.setScene(new Scene(root));
+                primaryStage.show();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        createButton.setOnAction(ActionEvent ->{
+            Stage primaryStage = new Stage();
+            try {
+                URL url = new File("C:\\JavaProjects\\demoProject1group\\src\\main\\java\\view\\CreateWindow.fxml").toURI().toURL();
+                Parent root = FXMLLoader.load(url);
+                primaryStage.setTitle("Create Client");
+                primaryStage.setScene(new Scene(root));
+                primaryStage.show();
 
 
 
@@ -108,13 +126,13 @@ public class ClientsTableController {
 
             System.out.println(clients.toString());
         }
-
     }
 
     @FXML
     public void firstNameOnEditCommit(TableColumn.CellEditEvent<Clients, String> clientsStringCellEditEvent) {
         Clients client =clientsStringCellEditEvent.getRowValue();
 
+        UpdateClientWindowController.setClient(client);
         System.out.println(client.toString());
 
         deleteButton.setOnAction(ActionEvent ->{
@@ -124,7 +142,6 @@ public class ClientsTableController {
             Stage primaryStage = new Stage();
             Parent root = null;
             URL url = null;
-
             try {
                 url = new File("C:\\JavaProjects\\demoProject1group\\src\\main\\java\\view\\ClientsTable.fxml").toURI().toURL();
                 root = FXMLLoader.load(url);
