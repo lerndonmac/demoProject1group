@@ -2,6 +2,8 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -14,6 +16,7 @@ public class Program extends Application {
         Parent root = FXMLLoader.load(url);
         primaryStage.setTitle("Start Window");
         primaryStage.setScene(new Scene(root));
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/service_logo.png")));
         primaryStage.show();
     }
 

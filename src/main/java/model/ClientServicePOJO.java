@@ -17,14 +17,20 @@ public class ClientServicePOJO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "ClientID")
     private Clients clientId;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "ServiceID")
     private ServicePOJO serviceId;
     @Column(name = "StartTime")
     private Date startTime;
     @Column(name = "Comment")
     private String comment;
+
+
+    @Override
+    public String toString(){
+        return "";
+    }
 }

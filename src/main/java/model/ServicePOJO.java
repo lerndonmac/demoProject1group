@@ -33,4 +33,9 @@ public class ServicePOJO {
     private String mainImagePath;
     @OneToMany(mappedBy = "serviceId")
     private Set<ClientServicePOJO> clientServiceS;
+
+    @Override
+    public String toString(){
+        return title;
+    }
 }

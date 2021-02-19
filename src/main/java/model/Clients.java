@@ -1,10 +1,14 @@
 package model;
 
+import DAO.DAO;
+import DAO.Service.ClientsService;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.Set;
+import java.time.Instant;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 //pojo
 @Getter
@@ -44,6 +48,15 @@ public class Clients {
     @NonNull
     private String photoPath;
 
+    private int countOfEntering;
+
+    @Transient
+    private Date dateOfLastEntering;
+
+    public Date getDateOfLastEntering() {
+        return dateOfLastEntering;
+    }
+
     public String getBirthDay() {
         return String.format("%tF",birthDay);
     }
@@ -51,17 +64,26 @@ public class Clients {
         return birthDay;
     }
 
+    public int getCountOfEntering() {
+        Set<ClientServicePOJO> clientsServices = clientServiceS;
+        return clientsServices.size();
+    }
+
     @ManyToOne
     @JoinColumn(name = "GenderCode")
     @NonNull
     private Gender gender;
 
-    @OneToMany(mappedBy = "clientId")
+    @OneToMany(mappedBy = "clientId", fetch = FetchType.EAGER)
     private Set<ClientServicePOJO> clientServiceS;
+    @Transient
+    private Date lastDate;
+
+
 
     @Override
     public String toString() {
-        return "Clients{" +
+        return "{" +
                 "id=" + id +
                 ", firstName='" + firstName  +
                 ", lastName='" + lastName +

@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -28,6 +29,7 @@ public class StartWindowControler {
                 root = FXMLLoader.load(url);
                 primaryStage.setTitle("Clients table");
                 primaryStage.setScene(new Scene(root));
+                primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/service_logo.png")));
                 primaryStage.show();
             } catch (IOException e) {
                 e.printStackTrace();
