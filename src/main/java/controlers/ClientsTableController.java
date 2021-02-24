@@ -3,8 +3,10 @@ package controlers;
 import DAO.DAO;
 import DAO.Service.ClientsService;
 import DAO.Service.GenderService;
+import javafx.beans.Observable;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.beans.value.ObservableValueBase;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
@@ -18,6 +20,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import model.ClientServicePOJO;
 import model.Clients;
 import model.Gender;
@@ -152,20 +155,18 @@ public class ClientsTableController {
         phoneColumn.setCellValueFactory(new PropertyValueFactory<Clients, String>("phone"));
         genderCodeColumn.setCellValueFactory(new PropertyValueFactory<Clients, Gender>("gender"));
         CountOfEntering.setCellValueFactory(new PropertyValueFactory<Clients, Integer>("countOfEntering"));
-        lastDateOfEnteringColumn.setCellValueFactory(u ->{if (
-                u.getValue().getClientServiceS().stream().max(Comparator.comparing(ClientServicePOJO::getStartTime)).isPresent())
-        {
-         return new SimpleObjectProperty<Date>(
-                u.getValue().getClientServiceS().stream().max(Comparator.comparing(ClientServicePOJO::getStartTime))
-                        .get().getStartTime());
-        }else {
-            return null;
-        }
+        lastDateOfEnteringColumn.setCellValueFactory(clientsDateCellDataFeatures -> {
+            if (clientsDateCellDataFeatures.getValue().getClientServiceS().stream().max(Comparator.comparing(ClientServicePOJO::getStartTime)).isPresent())//Present check if have not clientService
+            {
+            return new SimpleObjectProperty<>(
+            clientsDateCellDataFeatures.getValue()
+                    .getClientServiceS()
+                    .stream()
+                    .max(Comparator.comparing(ClientServicePOJO::getStartTime))
+                    .get()
+                    .getStartTime());}
+            else return new SimpleObjectProperty<>();
         });
-
-
-
-
 
         clientsTableView.getSelectionModel().selectedItemProperty().addListener(((observable,oldUser,product)-> {UpdateClientWindowController.setClient(product);}));
         clientsTableView.setItems(clientsObservableList);
