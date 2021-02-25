@@ -76,6 +76,11 @@ public class Clients {
 
     @OneToMany(mappedBy = "clientId", fetch = FetchType.EAGER)
     private Set<ClientServicePOJO> clientServiceS;
+
+    @ManyToMany(mappedBy = "clientsId", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<TagsPOJO> tags;
+
+
     @Transient
     private Date lastDate;
 

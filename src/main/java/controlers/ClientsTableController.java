@@ -10,6 +10,7 @@ import javafx.beans.value.ObservableValueBase;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
+import javafx.css.Style;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,21 +25,25 @@ import javafx.util.Callback;
 import model.ClientServicePOJO;
 import model.Clients;
 import model.Gender;
+import model.TagsPOJO;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class ClientsTableController {
     private final SessionFactory factory = new Configuration().configure().buildSessionFactory();
     public ObservableList<Clients> clientsObservableList = FXCollections.observableArrayList();
-    private ObservableList<Gender> genderObservableList = FXCollections.observableArrayList();
+
+    private final ObservableList<Gender> genderObservableList = FXCollections.observableArrayList();
+
+    private Clients choosenClient;
+    private static final Gender gender = new Gender("All");
 
     @FXML
     public TableView<Clients> clientsTableView;@FXML
@@ -51,8 +56,9 @@ public class ClientsTableController {
     public TableColumn<Clients,String> emailColumn;@FXML
     public TableColumn<Clients,String> phoneColumn;@FXML
     public TableColumn<Clients, Gender> genderCodeColumn;@FXML
-    public TextField countOfRows;@FXML
-    public Button countOfRowsSubmit;@FXML
+    public TableColumn<Clients, String> tagColumn;
+    public ComboBox<Integer> countOfRows;@FXML
+    public Button serviceButton;@FXML
     public Button createButton;@FXML
     public Button updateButton;@FXML
     public Button deleteButton;@FXML
@@ -72,8 +78,29 @@ public class ClientsTableController {
     private String photoPathData = "";
     @FXML
     public void initialize() {
-        Gender gender = new Gender("All");
-        genderObservableList.add(gender);
+
+        DAO<Clients , Integer> DAOClient = new ClientsService(new Configuration().configure().buildSessionFactory());
+        countOfRows.setItems(FXCollections.observableArrayList(Arrays.asList(10, 20, 30, 40, 50, DAOClient.readAll().size())));
+        countOfRows.getSelectionModel().selectedItemProperty().addListener((old, neo, real)->{
+            KostilClass.cont = countOfRows.getValue();
+            initData(KostilClass.cont);
+
+        });
+        serviceButton.setOnAction(actionEvent -> {
+            ServiceListController.clients = choosenClient;
+            Stage primaryStage = new Stage();
+            try {
+                Parent root = FXMLLoader.load(getClass().getResource("/view/ServicesWindow.fxml"));
+                primaryStage.setTitle("Services of "+choosenClient.getFirstName());
+                primaryStage.setScene(new Scene(root));
+                primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/service_logo.png")));
+                primaryStage.initModality(Modality.APPLICATION_MODAL);
+                primaryStage.showAndWait();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
         genderFilterCombo.setItems(genderObservableList);
         genderFilterCombo.setOnAction(actionEvent -> {
                     ObservableList<Clients> products = FXCollections.observableArrayList();
@@ -84,36 +111,13 @@ public class ClientsTableController {
                                 products.add(p);
                             }
                         }
-
-
                         clientsTableView.setItems(products);
-
-
                     }
                     });
-        countOfRowsSubmit.setOnAction(ActionEvent->{
-            KostilClass.cont = Integer.parseInt(countOfRows.getText());
-            countOfRowsSubmit.getScene().getWindow().hide();
-            Stage primaryStage = new Stage();
-            try {
-                URL url = new File("C:\\JavaProjects\\demoProject1group\\src\\main\\java\\view\\ClientsTable.fxml").toURI().toURL();
-                Parent root = FXMLLoader.load(url);
-                primaryStage.setTitle("Clients");
-                primaryStage.setScene(new Scene(root));
-                primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/service_logo.png")));
-                primaryStage.initModality(Modality.APPLICATION_MODAL);
-                primaryStage.showAndWait();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        });
         updateButton.setOnAction(ActionEvent ->{
             Stage primaryStage = new Stage();
             try {
-                URL url = new File("C:\\JavaProjects\\demoProject1group\\src\\main\\java\\view\\UpdateClientWindow.fxml").toURI().toURL();
-                Parent root = FXMLLoader.load(url);
+                Parent root = FXMLLoader.load(getClass().getResource("/view/UpdateClientWindow.fxml"));
                 primaryStage.setTitle("Update Client");
                 primaryStage.setScene(new Scene(root));
                 primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/service_logo.png")));
@@ -127,8 +131,7 @@ public class ClientsTableController {
         createButton.setOnAction(ActionEvent ->{
             Stage primaryStage = new Stage();
             try {
-                URL url = new File("C:\\JavaProjects\\demoProject1group\\src\\main\\java\\view\\CreateWindow.fxml").toURI().toURL();
-                Parent root = FXMLLoader.load(url);
+                Parent root = FXMLLoader.load(getClass().getResource("/view/CreateWindow.fxml"));
                 primaryStage.setTitle("Create Client");
                 primaryStage.setScene(new Scene(root));
                 primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/service_logo.png")));
@@ -141,7 +144,9 @@ public class ClientsTableController {
                 e.printStackTrace();
             }
         });
+        deleteButton.setOnAction(actionEvent -> {
 
+        });
 
         initData(KostilClass.cont);
 
@@ -167,18 +172,41 @@ public class ClientsTableController {
                     .getStartTime());}
             else return new SimpleObjectProperty<>();
         });
+        clientsTableView.getSelectionModel().selectedItemProperty().addListener(((observable,oldUser,product)-> {
+            UpdateClientWindowController.setClient(product);
+            choosenClient = product;
+            System.out.println(choosenClient);
+        }));
+        tagColumn.setCellValueFactory(c-> new SimpleObjectProperty<>(c.getValue().getTags().iterator().next().getColor() ));
+       tagColumn.setCellFactory(column -> new TableCell<>() {
+           @Override
+           protected void updateItem(String item, boolean empty) {
+               if(item != null || !empty){
+                   if(item.equalsIgnoreCase("green"))
+                       setStyle("-fx-background-color: #80ee80");
+                   if(item.equalsIgnoreCase("red"))
+                       setStyle("-fx-background-color: #db9898");
+                   if(item.equalsIgnoreCase("GRAY"))
+                       setStyle("-fx-background-color: #555555");
 
-        clientsTableView.getSelectionModel().selectedItemProperty().addListener(((observable,oldUser,product)-> {UpdateClientWindowController.setClient(product);}));
+               }
+           }
+       });
         clientsTableView.setItems(clientsObservableList);
+
     }
 
     public void initData(Integer count) {
         DAO<Clients, Integer> DAOCients = new ClientsService(factory);
         DAO<Gender, Integer> DAOGender = new GenderService(factory);
+        genderObservableList.clear();
+        genderObservableList.add(gender);
         genderObservableList.addAll(DAOGender.readAll());
 
 
         List<Clients> clientsList = DAOCients.readAll();
+        clientsObservableList.clear();
+
 
         for (int i = 0; i < count; i++) {
             Clients clients = clientsList.get(i);
@@ -199,30 +227,9 @@ public class ClientsTableController {
             System.out.println(clients.toString());
         }
     }
-
-    @FXML
-    public void firstNameOnEditCommit(TableColumn.CellEditEvent<Clients, String> clientsStringCellEditEvent) {
-        Clients client =clientsStringCellEditEvent.getRowValue();
-
-        UpdateClientWindowController.setClient(client);
-        System.out.println(client.toString());
-
-        deleteButton.setOnAction(ActionEvent ->{
-            DAO<Clients,Integer> clientsDAO = new ClientsService(factory);
-            clientsDAO.delete(client);
-            deleteButton.getScene().getWindow().hide();
-            Stage primaryStage = new Stage();
-            Parent root = null;
-            try {
-                root = FXMLLoader.load(getClass().getResource("/view\\ClientsTable.fxml"));
-                primaryStage.setTitle("Clients table");
-                primaryStage.setScene(new Scene(root));
-                primaryStage.show();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            factory.close();
-        });
-
+    public static List<TagsPOJO> setToList (Set<TagsPOJO> set){
+        return new ArrayList<TagsPOJO>(new ArrayList<>(set));
     }
+
 }
+//

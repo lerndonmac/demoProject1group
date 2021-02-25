@@ -16,5 +16,6 @@
         <mapping class="model.Gender"/>
         <mapping class="model.ClientServicePOJO"/>
         <mapping class="model.ServicePOJO"/>
+        <mapping class="model.TagsPOJO"/>
     </session-factory>
 </hibernate-configuration>

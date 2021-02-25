@@ -20,7 +20,7 @@ public class ClientServicePOJO {
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "ClientID")
     private Clients clientId;
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "ServiceID")
     private ServicePOJO serviceId;
     @Column(name = "StartTime")
