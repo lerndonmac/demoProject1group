@@ -40,6 +40,9 @@ public class ClientsTableController {
     private final SessionFactory factory = new Configuration().configure().buildSessionFactory();
     public ObservableList<Clients> clientsObservableList = FXCollections.observableArrayList();
 
+
+    private List<Clients> clientsList;
+
     private final ObservableList<Gender> genderObservableList = FXCollections.observableArrayList();
 
     private Clients choosenClient;
@@ -62,30 +65,61 @@ public class ClientsTableController {
     public Button createButton;@FXML
     public Button updateButton;@FXML
     public Button deleteButton;@FXML
-    public TableColumn<Clients, Integer> CountOfEntering;
-    public TableColumn<Clients, Date> lastDateOfEnteringColumn;
-    public ComboBox<Gender> genderFilterCombo;
+    public TableColumn<Clients, Integer> CountOfEntering;@FXML
+    public TableColumn<Clients, Date> lastDateOfEnteringColumn;@FXML
+    public ComboBox<Gender> genderFilterCombo;@FXML
+    public Pagination paginationId;@FXML
+    public Label countText;
 
-    private int idData = 0;
-    private String firstNameData = "";
-    private String lastNameData = "";
-    private String patronymicData= "";
-    private Date birthdayData = new Date();
-    private Date registrationDateData = new Date();
-    private String emailData = "";
-    private String phoneData = "";
-    private char genderData = 'e';
-    private String photoPathData = "";
+
+
     @FXML
     public void initialize() {
 
         DAO<Clients , Integer> DAOClient = new ClientsService(new Configuration().configure().buildSessionFactory());
         countOfRows.setItems(FXCollections.observableArrayList(Arrays.asList(10, 20, 30, 40, 50, DAOClient.readAll().size())));
-        countOfRows.getSelectionModel().selectedItemProperty().addListener((old, neo, real)->{
-            KostilClass.cont = countOfRows.getValue();
-            initData(KostilClass.cont);
+        countOfRows.setValue(countOfRows.getItems().get(countOfRows.getItems().size()-1));
+        countOfRows.valueProperty().addListener((old, neo, real)-> {
+            countOfRows.setValue(real);
+            countText.setText("Колличество записей: "+ countOfRows.getValue());
+            initData();
+            paginationId.setPageCount((int) Math.ceil(clientsObservableList.size() * 1.0 / countOfRows.getValue()));
 
+            clientsTableView.setItems(
+                    FXCollections.observableArrayList(clientsList.subList(paginationId.getCurrentPageIndex(), real))
+            );
+
+            paginationId.currentPageIndexProperty().addListener(
+                    (observable1, oldValue1, newValue1) -> {
+                        if (countOfRows.getValue() * (newValue1.intValue() + 1) < clientsList.size() ) {
+                            clientsTableView.setItems(
+                                    FXCollections.observableArrayList(
+                                            clientsObservableList.subList(
+                                                    (countOfRows.getValue() * (newValue1.intValue() + 1)
+                                                            - countOfRows.getValue()),
+                                                    countOfRows.getValue() * (newValue1.intValue() + 1)
+                                            )
+                                    )
+                            );
+                        }else {
+                            clientsTableView.setItems(
+                                    FXCollections.observableArrayList(
+                                            clientsObservableList.subList(
+                                                    (countOfRows.getValue() * (newValue1.intValue() + 1)
+                                                            - countOfRows.getValue()), clientsObservableList.size()
+                                            )
+                                    )
+                            );
+                        }
+                    }
+
+            );
         });
+        initData();
+        paginationId.setPageCount(1);
+        paginationId.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
+        countText.setText(countText.getText() + countOfRows.getValue());
+
         serviceButton.setOnAction(actionEvent -> {
             ServiceListController.clients = choosenClient;
             Stage primaryStage = new Stage();
@@ -148,7 +182,7 @@ public class ClientsTableController {
 
         });
 
-        initData(KostilClass.cont);
+
 
         idColumn.setCellValueFactory(new PropertyValueFactory<Clients, Integer>("id"));
         firstNameColumn.setCellValueFactory(new PropertyValueFactory<Clients, String>("firstName"));
@@ -192,38 +226,27 @@ public class ClientsTableController {
                }
            }
        });
-        clientsTableView.setItems(clientsObservableList);
+        clientsTableView.setItems(FXCollections.observableArrayList(clientsList));
 
     }
 
-    public void initData(Integer count) {
+    public void initData() {
+        int count = countOfRows.getValue();
         DAO<Clients, Integer> DAOCients = new ClientsService(factory);
         DAO<Gender, Integer> DAOGender = new GenderService(factory);
         genderObservableList.clear();
+        clientsObservableList.clear();
         genderObservableList.add(gender);
         genderObservableList.addAll(DAOGender.readAll());
 
 
-        List<Clients> clientsList = DAOCients.readAll();
-        clientsObservableList.clear();
-
+        clientsList = new ArrayList<>();
+        clientsObservableList.addAll(DAOCients.readAll());
+        clientsList.clear();
 
         for (int i = 0; i < count; i++) {
-            Clients clients = clientsList.get(i);
-            idData = clients.getId();
-            firstNameData = clients.getFirstName();
-            lastNameData = clients.getLastName();
-            patronymicData = clients.getPatronymic();
-//            birthdayData = clients.getBirthDay();
-            registrationDateData = clients.getRegistrationDate();
-            emailData = clients.getEmail();
-            phoneData = clients.getPhone();
-//            genderData = clients.getGender();
-            photoPathData = clients.getPhotoPath();
-
-
-            clientsObservableList.add(clients);
-
+            Clients clients = clientsObservableList.get(i);
+            clientsList.add(clients);
             System.out.println(clients.toString());
         }
     }
