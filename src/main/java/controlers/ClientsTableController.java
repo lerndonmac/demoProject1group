@@ -3,15 +3,10 @@ package controlers;
 import DAO.DAO;
 import DAO.Service.ClientsService;
 import DAO.Service.GenderService;
-import javafx.beans.Observable;
+import DAO.Service.TagsService;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.beans.value.ObservableValueBase;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
-import javafx.css.Style;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -21,20 +16,14 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import model.ClientServicePOJO;
 import model.Clients;
 import model.Gender;
 import model.TagsPOJO;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class ClientsTableController {
     private final SessionFactory factory = new Configuration().configure().buildSessionFactory();
@@ -66,12 +55,12 @@ public class ClientsTableController {
     public ComboBox<Gender> genderFilterCombo;@FXML
     public Pagination paginationId;@FXML
     public Label countText;
-
     @FXML
+
     public void initialize() {
 
         DAO<Clients , Integer> DAOClient = new ClientsService(new Configuration().configure().buildSessionFactory());
-        countOfRows.setItems(FXCollections.observableArrayList(Arrays.asList(10, 20, 30, 40, 50, DAOClient.readAll().size())));
+        countOfRows.setItems(FXCollections.observableArrayList(Arrays.asList(10, 50,200, DAOClient.readAll().size())));
         countOfRows.setValue(countOfRows.getItems().get(countOfRows.getItems().size()-1));
         countOfRows.valueProperty().addListener((old, neo, real)-> {
             countOfRows.setValue(real);
@@ -201,8 +190,11 @@ public class ClientsTableController {
         clientsTableView.getSelectionModel().selectedItemProperty().addListener(((observable,oldUser,product)-> {
             deleteButton.setOnAction(actionEvent -> {
                 DAO<Clients, Integer> clientsDAO = new ClientsService(factory);
-                clientsDAO.delete(product);
-                initData();
+                DAO<TagsPOJO, Integer> tagsDAO = new TagsService(factory);
+                if (product.getClientServiceS().isEmpty()) {
+                    clientsDAO.delete(product);
+                }else {countText.setText(" запрещенно удаление клиента с данными о посещении");}
+                initialize();
             });
             UpdateClientWindowController.setClient(product);
             choosenClient = product;
@@ -241,11 +233,13 @@ public class ClientsTableController {
         clientsObservableList.addAll(DAOCients.readAll());
         clientsList.clear();
 
-        for (int i = 0; i < count; i++) {
-            Clients clients = clientsObservableList.get(i);
-            clientsList.add(clients);
-            System.out.println(clients.toString());
-        }
+        if (countOfRows.getValue() < clientsObservableList.size()) {
+            for (int i = 0; i < count; i++) {
+                Clients clients = clientsObservableList.get(i);
+                clientsList.add(clients);
+                System.out.println(clients.toString());
+            }
+        }else clientsList = clientsObservableList;
     }
     public static List<TagsPOJO> setToList (Set<TagsPOJO> set){
         return new ArrayList<TagsPOJO>(new ArrayList<>(set));

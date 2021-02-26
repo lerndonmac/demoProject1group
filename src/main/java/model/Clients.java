@@ -74,10 +74,10 @@ public class Clients {
     @NonNull
     private Gender gender;
 
-    @OneToMany(mappedBy = "clientId", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "clientId", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<ClientServicePOJO> clientServiceS;
 
-    @ManyToMany(mappedBy = "clientsId", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "clientsId", fetch = FetchType.EAGER)
     private Set<TagsPOJO> tags;
 
 
