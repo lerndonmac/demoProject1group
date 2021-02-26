@@ -178,9 +178,7 @@ public class ClientsTableController {
                 e.printStackTrace();
             }
         });
-        deleteButton.setOnAction(actionEvent -> {
 
-        });
 
 
 
@@ -207,6 +205,11 @@ public class ClientsTableController {
             else return new SimpleObjectProperty<>();
         });
         clientsTableView.getSelectionModel().selectedItemProperty().addListener(((observable,oldUser,product)-> {
+            deleteButton.setOnAction(actionEvent -> {
+                DAO<Clients, Integer> clientsDAO = new ClientsService(factory);
+                clientsDAO.delete(product);
+                initData();
+            });
             UpdateClientWindowController.setClient(product);
             choosenClient = product;
             System.out.println(choosenClient);
