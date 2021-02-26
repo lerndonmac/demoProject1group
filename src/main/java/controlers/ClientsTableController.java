@@ -39,12 +39,8 @@ import java.util.stream.Collectors;
 public class ClientsTableController {
     private final SessionFactory factory = new Configuration().configure().buildSessionFactory();
     public ObservableList<Clients> clientsObservableList = FXCollections.observableArrayList();
-
-
     private List<Clients> clientsList;
-
     private final ObservableList<Gender> genderObservableList = FXCollections.observableArrayList();
-
     private Clients choosenClient;
     private static final Gender gender = new Gender("All");
 
@@ -70,8 +66,6 @@ public class ClientsTableController {
     public ComboBox<Gender> genderFilterCombo;@FXML
     public Pagination paginationId;@FXML
     public Label countText;
-
-
 
     @FXML
     public void initialize() {
@@ -256,6 +250,4 @@ public class ClientsTableController {
     public static List<TagsPOJO> setToList (Set<TagsPOJO> set){
         return new ArrayList<TagsPOJO>(new ArrayList<>(set));
     }
-
 }
-//
