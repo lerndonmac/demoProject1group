@@ -25,4 +25,10 @@ public class User {
     @Column(name = "rule")
     private String rule;
 
+    public User(String name, String login, String password, String rule) {
+        this.name = name;
+        this.login = login;
+        this.password = password;
+        this.rule = rule;
+    }
 }
