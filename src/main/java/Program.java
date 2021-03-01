@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 public class Program extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("/view/ClientsTable.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/view/LoginWindow.fxml"));
         primaryStage.setTitle("Start Window");
         primaryStage.setScene(new Scene(root));
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/service_logo.png")));

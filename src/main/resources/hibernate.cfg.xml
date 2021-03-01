@@ -17,5 +17,6 @@
         <mapping class="model.ClientServicePOJO"/>
         <mapping class="model.ServicePOJO"/>
         <mapping class="model.TagsPOJO"/>
+        <mapping class="model.User"/>
     </session-factory>
 </hibernate-configuration>

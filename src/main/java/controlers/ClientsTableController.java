@@ -32,6 +32,7 @@ public class ClientsTableController {
     private final ObservableList<Gender> genderObservableList = FXCollections.observableArrayList();
     private Clients choosenClient;
     private static final Gender gender = new Gender("All");
+    public Boolean rootRole = true;
 
     @FXML
     public TableView<Clients> clientsTableView;@FXML
@@ -58,6 +59,9 @@ public class ClientsTableController {
     @FXML
 
     public void initialize() {
+        createButton.setVisible(false);
+        updateButton.setVisible(false);
+        deleteButton.setVisible(false);
 
         DAO<Clients , Integer> DAOClient = new ClientsService(new Configuration().configure().buildSessionFactory());
         countOfRows.setItems(FXCollections.observableArrayList(Arrays.asList(10, 50,200, DAOClient.readAll().size())));
@@ -162,9 +166,6 @@ public class ClientsTableController {
             }
         });
 
-
-
-
         idColumn.setCellValueFactory(new PropertyValueFactory<Clients, Integer>("id"));
         firstNameColumn.setCellValueFactory(new PropertyValueFactory<Clients, String>("firstName"));
         lastNameColumn.setCellValueFactory(new PropertyValueFactory<Clients, String>("lastName"));
@@ -217,6 +218,11 @@ public class ClientsTableController {
        });
         clientsTableView.setItems(FXCollections.observableArrayList(clientsList));
 
+        if (LoginWinControl.rouleCheker){
+            createButton.setVisible(true);
+            updateButton.setVisible(true);
+            deleteButton.setVisible(true);
+        }
     }
 
     public void initData() {
