@@ -3,7 +3,6 @@ package controlers;
 import DAO.DAO;
 import DAO.Service.ClientsService;
 import DAO.Service.GenderService;
-import DAO.Service.TagsService;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,7 +18,6 @@ import javafx.stage.Stage;
 import model.ClientServicePOJO;
 import model.Clients;
 import model.Gender;
-import model.TagsPOJO;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import java.io.IOException;
@@ -33,7 +31,6 @@ public class ClientsTableController {
     private final ObservableList<Gender> genderObservableList = FXCollections.observableArrayList();
     private Clients choosenClient;
     private static final Gender gender = new Gender("All");
-    public Boolean rootRole = true;
 
     @FXML
     public TableView<Clients> clientsTableView;@FXML
@@ -57,9 +54,9 @@ public class ClientsTableController {
     public ComboBox<Gender> genderFilterCombo;@FXML
     public Pagination paginationId;@FXML
     public Label countText;
-@FXML
+    @FXML
     public ComboBox<String> filterSeekerCombo;
-@FXML
+    @FXML
     public TextField seekerField;
     @FXML
 
@@ -197,7 +194,6 @@ public class ClientsTableController {
         clientsTableView.getSelectionModel().selectedItemProperty().addListener(((observable,oldUser,product)-> {
             deleteButton.setOnAction(actionEvent -> {
                 DAO<Clients, Integer> clientsDAO = new ClientsService(factory);
-                DAO<TagsPOJO, Integer> tagsDAO = new TagsService(factory);
                 if (product.getClientServiceS().isEmpty()) {
                     clientsDAO.delete(product);
                 }else {countText.setText(" запрещенно удаление клиента с данными о посещении");}
@@ -287,8 +283,5 @@ public class ClientsTableController {
                 System.out.println(clients.toString());
             }
         }else clientsList = clientsObservableList;
-    }
-    public static List<TagsPOJO> setToList (Set<TagsPOJO> set){
-        return new ArrayList<TagsPOJO>(new ArrayList<>(set));
     }
 }
