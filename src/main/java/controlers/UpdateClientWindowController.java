@@ -8,17 +8,15 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import model.Clients;
 import model.Gender;
-import net.bytebuddy.asm.Advice;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.List;
 
 public class UpdateClientWindowController {
-    private ObservableList<Gender> genderObservableList = FXCollections.observableArrayList();
-    private SessionFactory factory = new Configuration().configure().buildSessionFactory();
+    private final ObservableList<Gender> genderObservableList = FXCollections.observableArrayList();
+    private final SessionFactory factory = new Configuration().configure().buildSessionFactory();
     public Gender gender;
     private static Clients client;
 
