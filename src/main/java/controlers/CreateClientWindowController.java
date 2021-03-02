@@ -7,13 +7,23 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import model.Clients;
 import model.Gender;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -36,12 +46,28 @@ public class CreateClientWindowController {
     public ChoiceBox<Gender> genderChoiceBox;
     public TextField emailTxt;
     public Label statusId;
+    public ImageView clientImageView;
 
     @FXML
     public void initialize(){
         initList();
         genderChoiceBox.setItems(genderObservableList);
         createButton.setOnAction(ActionEvent->createClient());
+        photoChooseButton.setOnAction(actionEvent -> {
+            FileChooser fileChooser = new FileChooser();
+            FileInputStream photoFile = null;
+            fileChooser.setInitialDirectory(new File(getClass().getResource("/fotos").getFile()));
+            File photo = fileChooser.showOpenDialog(new Stage()).getAbsoluteFile();
+            try {
+                photoFile = new FileInputStream(photo);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            System.out.println(photo);
+            clientImageView.setImage(new Image(photoFile));
+
+            photoPathTxt.setText(photo.getAbsolutePath());
+        });
     }
 
     public void initList(){
