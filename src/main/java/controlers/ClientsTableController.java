@@ -25,7 +25,7 @@ import java.util.*;
 
 public class ClientsTableController {
     private final SessionFactory factory = new Configuration().configure().buildSessionFactory();
-    public ObservableList<Clients> clientsObservableList = FXCollections.observableArrayList();
+    private final ObservableList<Clients> clientsObservableList = FXCollections.observableArrayList();
 
     private List<Clients> clientsList;
     private final ObservableList<Gender> genderObservableList = FXCollections.observableArrayList();
@@ -33,31 +33,31 @@ public class ClientsTableController {
     private static final Gender gender = new Gender("All");
 
     @FXML
-    public TableView<Clients> clientsTableView;@FXML
-    public TableColumn<Clients,Integer> idColumn;@FXML
-    public TableColumn<Clients,String> firstNameColumn;@FXML
-    public TableColumn<Clients,String> lastNameColumn;@FXML
-    public TableColumn<Clients,String> patronymicColumn;@FXML
-    public TableColumn<Clients,String> birthdayColumn;@FXML
-    public TableColumn<Clients,Date> registrationDateColumn;@FXML
-    public TableColumn<Clients,String> emailColumn;@FXML
-    public TableColumn<Clients,String> phoneColumn;@FXML
-    public TableColumn<Clients, Gender> genderCodeColumn;@FXML
-    public TableColumn<Clients, String> tagColumn;
+    private TableView<Clients> clientsTableView;@FXML
+    private TableColumn<Clients,Integer> idColumn;@FXML
+    private TableColumn<Clients,String> firstNameColumn;@FXML
+    private TableColumn<Clients,String> lastNameColumn;@FXML
+    private TableColumn<Clients,String> patronymicColumn;@FXML
+    private TableColumn<Clients,String> birthdayColumn;@FXML
+    private TableColumn<Clients,Date> registrationDateColumn;@FXML
+    private TableColumn<Clients,String> emailColumn;@FXML
+    private TableColumn<Clients,String> phoneColumn;@FXML
+    private TableColumn<Clients, Gender> genderCodeColumn;@FXML
+    private TableColumn<Clients, String> tagColumn;
     public ComboBox<Integer> countOfRows;@FXML
-    public Button serviceButton;@FXML
-    public Button createButton;@FXML
-    public Button updateButton;@FXML
-    public Button deleteButton;@FXML
-    public TableColumn<Clients, Integer> CountOfEntering;@FXML
-    public TableColumn<Clients, Date> lastDateOfEnteringColumn;@FXML
-    public ComboBox<Gender> genderFilterCombo;@FXML
-    public Pagination paginationId;@FXML
-    public Label countText;
+    private Button serviceButton;@FXML
+    private Button createButton;@FXML
+    private Button updateButton;@FXML
+    private Button deleteButton;@FXML
+    private TableColumn<Clients, Integer> CountOfEntering;@FXML
+    private TableColumn<Clients, Date> lastDateOfEnteringColumn;@FXML
+    private ComboBox<Gender> genderFilterCombo;@FXML
+    private Pagination paginationId;@FXML
+    private Label countText;
     @FXML
-    public ComboBox<String> filterSeekerCombo;
+    private ComboBox<String> filterSeekerCombo;
     @FXML
-    public TextField seekerField;
+    private TextField seekerField;
     @FXML
 
     public void initialize() {
