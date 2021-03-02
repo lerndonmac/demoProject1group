@@ -28,6 +28,7 @@ import java.util.*;
 public class ClientsTableController {
     private final SessionFactory factory = new Configuration().configure().buildSessionFactory();
     public ObservableList<Clients> clientsObservableList = FXCollections.observableArrayList();
+
     private List<Clients> clientsList;
     private final ObservableList<Gender> genderObservableList = FXCollections.observableArrayList();
     private Clients choosenClient;
@@ -56,6 +57,10 @@ public class ClientsTableController {
     public ComboBox<Gender> genderFilterCombo;@FXML
     public Pagination paginationId;@FXML
     public Label countText;
+@FXML
+    public ComboBox<String> filterSeekerCombo;
+@FXML
+    public TextField seekerField;
     @FXML
 
     public void initialize() {
@@ -125,7 +130,8 @@ public class ClientsTableController {
         genderFilterCombo.setItems(genderObservableList);
         genderFilterCombo.setOnAction(actionEvent -> {
                     ObservableList<Clients> products = FXCollections.observableArrayList();
-                    if (genderFilterCombo.getValue().equals(gender)){clientsTableView.setItems(clientsObservableList);}else {
+                    if (genderFilterCombo.getValue().equals(gender)){clientsTableView.setItems(clientsObservableList);}
+                    else {
                         for (int i = 0; i < clientsObservableList.size() - 1; i++) {
                             Clients p = clientsObservableList.get(i);
                             if (p.getGender().getGenderName().equals(genderFilterCombo.getValue().getGenderName())) {
@@ -166,16 +172,16 @@ public class ClientsTableController {
             }
         });
 
-        idColumn.setCellValueFactory(new PropertyValueFactory<Clients, Integer>("id"));
-        firstNameColumn.setCellValueFactory(new PropertyValueFactory<Clients, String>("firstName"));
-        lastNameColumn.setCellValueFactory(new PropertyValueFactory<Clients, String>("lastName"));
-        patronymicColumn.setCellValueFactory(new PropertyValueFactory<Clients, String>("patronymic"));
-        birthdayColumn.setCellValueFactory(new PropertyValueFactory<Clients, String>("birthDay"));
-        registrationDateColumn.setCellValueFactory(new PropertyValueFactory<Clients, Date>("registrationDate"));
-        emailColumn.setCellValueFactory(new PropertyValueFactory<Clients, String>("email"));
-        phoneColumn.setCellValueFactory(new PropertyValueFactory<Clients, String>("phone"));
-        genderCodeColumn.setCellValueFactory(new PropertyValueFactory<Clients, Gender>("gender"));
-        CountOfEntering.setCellValueFactory(new PropertyValueFactory<Clients, Integer>("countOfEntering"));
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        firstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+        lastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+        patronymicColumn.setCellValueFactory(new PropertyValueFactory<>("patronymic"));
+        birthdayColumn.setCellValueFactory(new PropertyValueFactory<>("birthDay"));
+        registrationDateColumn.setCellValueFactory(new PropertyValueFactory<>("registrationDate"));
+        emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
+        phoneColumn.setCellValueFactory(new PropertyValueFactory<>("phone"));
+        genderCodeColumn.setCellValueFactory(new PropertyValueFactory<>("gender"));
+        CountOfEntering.setCellValueFactory(new PropertyValueFactory<>("countOfEntering"));
         lastDateOfEnteringColumn.setCellValueFactory(clientsDateCellDataFeatures -> {
             if (clientsDateCellDataFeatures.getValue().getClientServiceS().stream().max(Comparator.comparing(ClientServicePOJO::getStartTime)).isPresent())//Present check if have not clientService
             {
@@ -206,6 +212,7 @@ public class ClientsTableController {
            @Override
            protected void updateItem(String item, boolean empty) {
                if(item != null || !empty){
+                   assert item != null;
                    if(item.equalsIgnoreCase("green"))
                        setStyle("-fx-background-color: #80ee80");
                    if(item.equalsIgnoreCase("red"))
@@ -217,13 +224,47 @@ public class ClientsTableController {
            }
        });
         clientsTableView.setItems(FXCollections.observableArrayList(clientsList));
-
         if (LoginWinControl.rouleCheker){
             createButton.setVisible(true);
             updateButton.setVisible(true);
             deleteButton.setVisible(true);
         }
-    }
+        filterSeekerCombo.setItems(FXCollections.observableArrayList("FIO", "Phone", "Email"));
+        filterSeekerCombo.setValue(filterSeekerCombo.getItems().get(0));
+
+            seekerField.setOnKeyPressed(actionEvent -> {
+                ObservableList<Clients> clients = FXCollections.observableArrayList();
+                if (filterSeekerCombo.getValue().equals("Phone")){
+                    for (Clients client: clientsObservableList){
+
+                        if (client.getPhone().contains(seekerField.getText())){
+                            clients.add(client);
+
+                        }
+                    }
+                    clientsTableView.setItems(clients);
+                }
+                if (filterSeekerCombo.getValue().equals("FIO")){
+                    for (Clients client: clientsObservableList){
+                        if (client.getFirstName().contains(seekerField.getText())
+                                ||client.getLastName().contains(seekerField.getText())
+                                ||client.getPatronymic().contains(seekerField.getText())){
+
+                            clients.add(client);
+                        }
+                    }
+                    clientsTableView.setItems(clients);
+                }
+                if (filterSeekerCombo.getValue().equals("Email")){
+                    for (Clients client: clientsObservableList){
+                        if (client.getEmail().contains(seekerField.getText())){
+                            clients.add(client);
+                        }
+                    }
+                    clientsTableView.setItems(clients);
+                }
+            });
+        }
 
     public void initData() {
         int count = countOfRows.getValue();
